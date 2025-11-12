@@ -7,4 +7,3 @@ abort "Usage: #{$0} input.epub output.epub" unless input && output
 abort "File not found: #{input}" unless File.exist?(input)
 
 EpubOptimizer.new.optimize(input, output)
-puts "Optimized: #{output}"
