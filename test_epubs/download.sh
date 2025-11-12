@@ -3,9 +3,7 @@
 mkdir -p epubs optimized_epubs
 echo "Downloading 50 EPUBs from Project Gutenberg..."
 
-# Get 50 EPUBs directly from Project Gutenberg (more reliable)
 for i in {1..50}; do
-  # Get random book ID between 1000 and 70000 (popular range)
   book_id=$((RANDOM % 69000 + 1000))
   url="https://www.gutenberg.org/ebooks/${book_id}.epub.noimages"
   filename="book_${book_id}.epub"
@@ -19,4 +17,6 @@ for i in {1..50}; do
   fi
 done
 
-echo "Done! $(ls epubs/*.epub 2>/dev/null | wc -l) EPUBs downloaded."
+count=$(ls epubs/*.epub 2>/dev/null | wc -l)
+echo "Done! $count EPUBs downloaded to epubs/"
+echo "Ready for optimization - output will go to optimized_epubs/"
