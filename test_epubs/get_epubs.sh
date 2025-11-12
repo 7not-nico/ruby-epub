@@ -1,15 +1,22 @@
 #!/bin/bash
 # Download 50 EPUBs for testing
 mkdir -p epubs
-echo "Downloading 50 EPUBs..."
-curl -s "https://api.github.com/orgs/standardebooks/repos?per_page=100" | grep -o '"clone_url": "[^"]*' | cut -d'"' -f4 | shuf | head -30 | while read repo; do
-  name=$(basename "$repo" .git)
-  echo "Getting $name..."
-  git clone --depth 1 "$repo" "temp_$name" 2>/dev/null && \
-  find "temp_$name" -name "*.epub" -exec cp {} epubs/ \; && \
-  rm -rf "temp_$name"
+echo "Downloading 50 EPUBs from Project Gutenberg..."
+
+# Get 50 EPUBs directly from Project Gutenberg (more reliable)
+for i in {1..50}; do
+  # Get random book ID between 1000 and 70000 (popular range)
+  book_id=$((RANDOM % 69000 + 1000))
+  url="https://www.gutenberg.org/ebooks/${book_id}.epub.noimages"
+  filename="book_${book_id}.epub"
+  
+  echo -n "Getting book $book_id... "
+  if curl -s -L -f -o "epubs/$filename" "$url" 2>/dev/null; then
+    echo "✓"
+  else
+    echo "✗"
+    rm -f "epubs/$filename" 2>/dev/null
+  fi
 done
-curl -s "https://www.gutenberg.org/cache/epub/feeds/today.rss" | grep -o 'https://www.gutenberg.org/ebooks/[0-9]*\.epub\.noimages' | head -20 | while read url; do
-  curl -s -L -o "epubs/$(basename "$url")" "$url"
-done
+
 echo "Done! $(ls epubs/*.epub 2>/dev/null | wc -l) EPUBs downloaded."
