@@ -9,5 +9,7 @@ curl -s "https://api.github.com/orgs/standardebooks/repos?per_page=100" | grep -
   find "temp_$name" -name "*.epub" -exec cp {} epubs/ \; && \
   rm -rf "temp_$name"
 done
-curl -s "https://www.gutenberg.org/cache/epub/feeds/today.rss" | grep -o 'https://www.gutenberg.org/ebooks/[0-9]*\.epub\.noimages' | head -20 | xargs -n1 -P5 wget -q -P epubs/
+curl -s "https://www.gutenberg.org/cache/epub/feeds/today.rss" | grep -o 'https://www.gutenberg.org/ebooks/[0-9]*\.epub\.noimages' | head -20 | while read url; do
+  curl -s -L -o "epubs/$(basename "$url")" "$url"
+done
 echo "Done! $(ls epubs/*.epub 2>/dev/null | wc -l) EPUBs downloaded."
