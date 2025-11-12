@@ -1,6 +1,6 @@
 #!/bin/bash
 # Download 50 EPUBs for testing
-mkdir -p epubs
+mkdir -p epubs optimized_epubs
 echo "Downloading 50 EPUBs from Project Gutenberg..."
 
 # Get 50 EPUBs directly from Project Gutenberg (more reliable)
