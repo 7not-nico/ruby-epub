@@ -1,9 +1,71 @@
 #!/usr/bin/env ruby
 # EPUB Optimizer - Main executable script
-require_relative 'lib/epub_optimizer'
 
 # Change to script's directory to ensure relative paths work
 Dir.chdir(File.dirname(__FILE__))
 
-# Load main optimization script
-load 'lib/epub_optimizer.rb'
+# Load the library
+require_relative 'lib/epub_optimizer'
+
+# Command line interface
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{$0} [options] <input.epub> [output.epub]"
+  
+  opts.on("--threads N", Integer, "Number of threads to use (default: auto-detect)") do |t|
+    options[:threads] = t
+  end
+  
+  opts.on("--dry-run", "Preview optimization without making changes") do
+    options[:dry_run] = true
+  end
+  
+  opts.on("--quiet", "Minimal output") do
+    options[:quiet] = true
+  end
+  
+  opts.on("--force", "Optimize even if file might increase in size") do
+    options[:force] = true
+  end
+  
+  opts.on("--output-dir DIR", "Output directory for optimized files") do |dir|
+    options[:output_dir] = dir
+  end
+  
+  opts.on("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end.parse!
+
+if ARGV.empty?
+  puts "Error: Input file required"
+  puts "Usage: #{$0} [options] <input.epub> [output.epub]"
+  exit 1
+end
+
+input_file = ARGV[0]
+output_file = ARGV[1]
+
+unless File.exist?(input_file)
+  puts "Error: Input file '#{input_file}' not found"
+  exit 1
+end
+
+begin
+  optimizer = EpubOptimizer.new(options)
+  result = optimizer.optimize(input_file, output_file)
+  
+  # Exit with appropriate code for CI/CD
+  if result[:success]
+    exit 0
+  elsif result[:reason] == "size_increase"
+    exit 2  # Special exit code for size increase
+  else
+    exit 1
+  end
+rescue => e
+  puts "Error: #{e.message}" unless options[:quiet]
+  exit 1
+end

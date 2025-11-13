@@ -178,7 +178,7 @@ class EpubOptimizer
 end
 
 # Command line interface
-if __FILE__ == $0
+if __FILE__ == $0 || (defined?(ARGV) && ARGV.include?('--help'))
   options = {}
   
   OptionParser.new do |opts|
