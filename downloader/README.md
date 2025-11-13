@@ -4,12 +4,14 @@ Download EPUB files from multiple sources in parallel.
 
 ## Usage
 
+### Local
 ```bash
-# Download 100 EPUBs (default)
 ./epub-downloader
+```
 
-# Download specific number
-./epub-downloader 50
+### GitHub Online
+```bash
+curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/downloader/epub-downloader | ruby
 ```
 
 ## What It Does
@@ -21,7 +23,8 @@ Download EPUB files from multiple sources in parallel.
 
 ## Requirements
 
-Ruby 2.5+, gem: parallel
+**Local**: Ruby 2.5+, gem: parallel
+**GitHub**: No installation needed
 
 ## Performance
 

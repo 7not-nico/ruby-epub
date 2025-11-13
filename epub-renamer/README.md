@@ -4,11 +4,13 @@ Rename EPUB files using metadata (title and author).
 
 ## Usage
 
+### Local
 ```bash
-# Local
 ./epub-renamer book.epub
+```
 
-# GitHub direct
+### GitHub Online
+```bash
 curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub-renamer/epub-renamer-github.sh | bash -s -- book.epub
 ```
 
@@ -21,7 +23,8 @@ curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub-rename
 
 ## Requirements
 
-Ruby, gems: zip nokogiri
+**Local**: Ruby, gems: zip nokogiri
+**GitHub**: No installation needed
 
 ## Example
 

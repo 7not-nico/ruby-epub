@@ -4,11 +4,13 @@ Compress EPUB files by optimizing images and minifying text.
 
 ## Usage
 
+### Local
 ```bash
-# Local
 ./epub_optimizer input.epub output.epub
+```
 
-# GitHub direct
+### GitHub Online
+```bash
 curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/optimizer/temp_repo/epub_optimizer_github.rb | ruby - input.epub output.epub
 ```
 
@@ -21,7 +23,8 @@ curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/optimizer/t
 
 ## Requirements
 
-Ruby 2.7+, ImageMagick, gems: zip mini_magick parallel nokogiri
+**Local**: Ruby 2.7+, ImageMagick, gems: zip mini_magick parallel nokogiri
+**GitHub**: No installation needed
 
 ## Performance
 
