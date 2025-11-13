@@ -87,7 +87,7 @@ class EpubOptimizerDirect
       @temp_script = Tempfile.new(['epub_optimizer', '.rb'])
       @temp_script.write(response.body)
       @temp_script.close
-      @temp_script.chmod(0700)
+      File.chmod(0700, @temp_script.path)
 
       puts "✓ Optimizer downloaded successfully"
       puts "Starting optimization..."

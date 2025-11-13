@@ -34,6 +34,17 @@ cd ruby-epub
 gem install zip mini_magick parallel nokogiri
 ```
 
+### Option 4: No Installation Required
+You can run the optimizer directly from GitHub without any installation:
+
+```bash
+# Method 1: Shell script (bash)
+curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub_optimizer.sh | bash -s -- input.epub output.epub
+
+# Method 2: Ruby script (cross-platform)
+curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub_optimizer_direct.rb | ruby - input.epub output.epub
+```
+
 ## Usage
 
 ### After Quick Install:
@@ -54,6 +65,11 @@ epub_optimizer input.epub output.epub
 ### Web Service (No Installation):
 ```bash
 curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub_optimizer.sh | bash -s -- input.epub output.epub
+```
+
+### GitHub Direct Execution (No Installation):
+```bash
+curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub_optimizer_direct.rb | ruby - input.epub output.epub
 ```
 
 ## Usage
