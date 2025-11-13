@@ -8,18 +8,12 @@
   - [ ] Validate EPUB compliance after optimization (EPUBCheck integration)
   - [ ] Performance testing on low-spec hardware
 
-- [ ] **Implement resume functionality for interrupted batch operations**
-  - [ ] Track completed files in a state file
-  - [ ] Allow resuming from where optimization left off
-  - [ ] Handle partial batch recovery
-
 ## Medium Priority
-- [ ] **Feature Enhancements**
+- [ ] **Script Enhancements**
   - [ ] Add EPUB 3.0 support with fixed layout optimization
   - [ ] Implement content-aware image optimization (detect text vs photos)
   - [ ] Add support for AVIF image format when available
-  - [ ] Create GUI interface for non-technical users
-  - [ ] Add batch processing with progress bars
+  - [ ] Add command-line options for quality settings
   - [ ] Implement undo functionality (restore original EPUB)
 
 - [ ] **Error Handling & Quality**
@@ -28,9 +22,6 @@
   - [ ] Option to skip or keep original for those files
   - [ ] Log problematic files for analysis
   - [ ] Implement optimization quality detection to skip files that won't benefit
-  - [ ] Pre-analyze files to predict optimization benefit
-  - [ ] Skip files unlikely to be reduced significantly
-  - [ ] Save processing time on already-optimized content
 
 - [ ] **Performance Optimizations**
   - [ ] Add GPU acceleration for image processing
@@ -46,14 +37,11 @@
 
 ## Low Priority
 - [ ] **User Experience**
-  - [ ] Add progress bar and ETA estimation for large batch operations
+  - [ ] Add progress bar and ETA estimation for large EPUBs
   - [ ] Visual progress indicator with percentage
   - [ ] Estimated time remaining calculation
   - [ ] Real-time throughput statistics
   - [ ] Add dry-run mode to preview optimization results without processing
-  - [ ] Simulate optimization without actual file changes
-  - [ ] Show estimated space savings and processing time
-  - [ ] Allow users to preview before committing
 
 - [ ] **Configuration**
   - [ ] Create configuration file for optimization parameters
@@ -75,11 +63,11 @@
   - [ ] Implement content type detection for better optimization
   - [ ] Add predictive performance estimation
 
-- [ ] **Enterprise Features**
-  - [ ] Add user authentication and authorization
-  - [ ] Implement audit logging and usage analytics
-  - [ ] Create multi-tenant architecture
-  - [ ] Add SLA monitoring and alerting
+- [ ] **Advanced Features**
+  - [ ] Add batch processing with progress tracking
+  - [ ] Create GUI interface for non-technical users
+  - [ ] Implement REST API for web service integration
+  - [ ] Add Docker container for easy deployment
 
 ## Technical Debt
 - [ ] **Code Quality**
@@ -174,45 +162,6 @@
 
 ---
 
-## Completed ✅
-
-### Recent Achievements
-- [x] **Core Optimizer Development**
-  - [x] Implement 12+ advanced optimizations (WebP, progressive JPEG, HTML/CSS minification, duplicate detection, font subsetting)
-  - [x] Achieve 13-29% compression improvement over original
-  - [x] Add content-aware processing (text vs image-heavy EPUBs)
-  - [x] Implement smart threading with CPU-aware optimization
-
-- [x] **Multiple Execution Methods**
-  - [x] Development version (lib/epub_optimizer.rb)
-  - [x] Standalone executable (epub_optimizer_standalone.rb)
-  - [x] Installation script (install.sh)
-  - [x] Shell web service (epub_optimizer.sh)
-  - [x] GitHub direct execution (epub_optimizer_direct.rb)
-
-- [x] **Testing & Validation**
-  - [x] Create comprehensive test suite (test_all_methods.rb)
-  - [x] Performance benchmark script (benchmark.rb)
-  - [x] Test with real EPUB files of various sizes
-  - [x] Validate 4/5 execution methods working
-
-- [x] **Documentation & Tools**
-  - [x] Comprehensive usage examples (USAGE_EXAMPLES.md)
-  - [x] Version management system (version.rb)
-  - [x] Updated README.md with all features
-  - [x] Performance documentation (PERFORMANCE_OPTIMIZATION.md)
-  - [x] Development insights (DEVELOPMENT_INSIGHTS.md)
-
-- [x] **Previous Batch Processing**
-  - [x] Fix syntax error in test_fast.rb
-  - [x] Test fixed script on all 96 EPUB files  
-  - [x] Verify optimized files are created correctly
-  - [x] Compare performance with original sequential method
-  - [x] Check for any failed optimizations
-  - [x] Commit and push working version
-
----
-
 ## Current Status
 
 ### Performance Metrics
@@ -234,7 +183,7 @@
   ```
 - ✅ **GitHub Direct Execution** (fully functional, no installation)
   ```bash
-  curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub_optimizer_direct.rb | ruby - input.epub output.epub
+  curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/scripts/epub_optimizer_direct.rb | ruby - input.epub output.epub
   ```
 
 ### Additional Options
@@ -261,4 +210,4 @@
 
 ---
 
-*This TODO list is a living document and will be updated as priorities change and new requirements emerge.*
+*This TODO list is focused on terminal-based EPUB optimization script with local and GitHub direct execution capabilities.*
