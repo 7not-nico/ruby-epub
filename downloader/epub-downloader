@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+
+require 'net/http'
+require 'uri'
+require 'fileutils'
+require 'parallel'
+require_relative 'lib/epub_downloader'
+
+class EpubDownloaderApp
+  def initialize
+    @downloader = EpubDownloader.new
+    @sources = load_sources
+  end
+
+  def run(count = 100)
+    puts "📚 EPUB Downloader - Starting download of #{count} files..."
+    
+    downloaded = @downloader.download_batch(@sources, count)
+    
+    puts "\n✅ Download complete!"
+    puts "📊 Successfully downloaded: #{downloaded[:success]}"
+    puts "❌ Failed: #{downloaded[:failed]}"
+    puts "📁 Output directory: #{downloaded[:directory]}"
+    
+    exit downloaded[:failed] > 0 ? 1 : 0
+  end
+
+  private
+
+  def load_sources
+    [
+      'https://www.gutenberg.org/cache/epub/11/pg11.epub',
+      'https://www.gutenberg.org/cache/epub/74/pg74.epub',
+      'https://www.gutenberg.org/cache/epub/1661/pg1661.epub',
+      'https://www.gutenberg.org/cache/epub/2701/pg2701.epub',
+      'https://www.gutenberg.org/cache/epub/345/pg345.epub',
+      'https://www.gutenberg.org/cache/epub/1342/pg1342.epub',
+      'https://www.gutenberg.org/cache/epub/84/pg84.epub',
+      'https://www.gutenberg.org/cache/epub/23/pg23.epub',
+      'https://www.gutenberg.org/cache/epub/2591/pg2591.epub',
+      'https://www.gutenberg.org/cache/epub/43/pg43.epub'
+    ]
+  end
+end
+
+if __FILE__ == $0
+  count = ARGV[0] ? ARGV[0].to_i : 100
+  app = EpubDownloaderApp.new
+  app.run(count)
+end

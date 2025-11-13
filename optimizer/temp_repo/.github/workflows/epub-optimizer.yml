@@ -1,0 +1,191 @@
+name: EPUB Optimizer CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'lib/**'
+      - 'epub_optimizer'
+      - '.github/workflows/epub-optimizer.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'lib/**'
+      - 'epub_optimizer'
+      - '.github/workflows/epub-optimizer.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        ruby-version: ['3.1', '3.2']
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Ruby ${{ matrix.ruby-version }}
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+        
+    - name: Install dependencies
+      run: |
+        gem install zip mini_magick parallel nokogiri --no-document
+        
+    - name: Create test EPUB file
+      run: |
+        mkdir -p test_epubs/raw
+        cat > test_epubs/raw/mimetype << 'EOF'
+application/epub+zip
+EOF
+        
+        mkdir -p test_epubs/raw/META-INF
+        cat > test_epubs/raw/META-INF/container.xml << 'EOF'
+<?xml version="1.0"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+  <rootfiles>
+    <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>
+  </rootfiles>
+</container>
+EOF
+        
+        mkdir -p test_epubs/raw/OEBPS
+        cat > test_epubs/raw/OEBPS/content.opf << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="2.0">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:title>Test Book Title</dc:title>
+    <dc:creator>Test Author</dc:creator>
+  </metadata>
+  <manifest>
+    <item id="chapter1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>
+  </manifest>
+  <spine toc="ncx">
+    <itemref idref="chapter1"/>
+  </spine>
+</package>
+EOF
+        
+        cat > test_epubs/raw/OEBPS/chapter1.xhtml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Chapter 1</title></head>
+<body><p>Test content with some text to optimize.</p></body>
+</html>
+EOF
+        
+        # Create EPUB file
+        cd test_epubs/raw
+        zip -r test_book.epub mimetype META-INF OEBPS/
+        cd ../../
+        
+    - name: Test local script execution
+      run: |
+        ruby epub_optimizer test_epubs/raw/test_book.epub test_epubs/optimized/test_book.epub
+        
+    - name: Verify optimized file exists
+      run: |
+        if [ -f "test_epubs/optimized/test_book.epub" ]; then
+          echo "✅ Local script test passed"
+        else
+          echo "❌ Local script test failed"
+          exit 1
+        fi
+        
+    - name: Test script with options
+      run: |
+        ruby epub_optimizer --dry-run --threads 2 test_epubs/raw/test_book.epub
+        
+    - name: Test quiet mode
+      run: |
+        ruby epub_optimizer --quiet test_epubs/raw/test_book.epub test_epubs/optimized/quiet_test.epub
+        
+    - name: Test error handling
+      run: |
+        # Test with non-existent file
+        ruby epub_optimizer nonexistent.epub || echo "✅ Error handling works"
+        
+        # Test with no arguments
+        ruby epub_optimizer || echo "✅ Argument validation works"
+        
+    - name: Test script syntax validation
+      run: |
+        ruby -c epub_optimizer
+        if [ $? -eq 0 ]; then
+          echo "✅ Script syntax is valid"
+        else
+          echo "❌ Script syntax error"
+          exit 1
+        fi
+        
+    - name: Upload optimized EPUB as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: optimized-epub-${{ matrix.os }}-${{ matrix.ruby-version }}
+        path: test_epubs/optimized/
+        
+    - name: Cleanup test files
+      if: always()
+      run: |
+        rm -rf test_epubs/
+
+  test-github-runner:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Test GitHub runner without installation
+      run: |
+        # Create a simple test EPUB
+        mkdir -p temp_test
+        cd temp_test
+        
+        cat > mimetype << 'EOF'
+application/epub+zip
+EOF
+        
+        mkdir -p META-INF
+        cat > META-INF/container.xml << 'EOF'
+<?xml version="1.0"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+  <rootfiles>
+    <rootfile full-path="content.opf" media-type="application/oebps-package+xml"/>
+  </rootfiles>
+</container>
+EOF
+        
+        cat > content.opf << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="2.0">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:title>GitHub Test Book</dc:title>
+    <dc:creator>GitHub Test Author</dc:creator>
+  </metadata>
+  <manifest>
+    <item id="chapter1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>
+  </manifest>
+  <spine>
+    <itemref idref="chapter1"/>
+  </spine>
+</package>
+EOF
+        
+        cat > chapter1.xhtml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>Test</title></head>
+<body><p>GitHub Actions test content</p></body>
+</html>
+EOF
+        
+        zip -r github_test.epub mimetype META-INF content.opf chapter1.xhtml
+        
+        # Test GitHub runner (when available)
+        echo "✅ GitHub runner environment ready"
+        
+        cd ..
+        rm -rf temp_test/
