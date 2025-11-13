@@ -3,39 +3,54 @@
 require 'zip'
 require 'nokogiri'
 
-def rename_epub(epub_path)
-  Zip::File.open(epub_path) do |zip|
-    container = zip.find_entry('META-INF/container.xml')
-    return unless container
+INVALID_CHARS = /[<>:"\/\\\|\?*]/
+MULTIPLE_SPACES = /\s+/
 
-    opf_path = Nokogiri::XML(container.get_input_stream.read)
-                     .at_xpath('//xmlns:rootfile/@full-path')&.value
-    return unless opf_path
-
-    opf = zip.find_entry(opf_path)
-    return unless opf
-
-    doc = Nokogiri::XML(opf.get_input_stream.read)
-    title = doc.at_xpath('//dc:title')&.text&.strip
-    author = doc.at_xpath('//dc:creator')&.text&.strip
-    return unless title
-
-    filename = "#{title}#{author ? " - #{author}" : ''}".gsub(/[<>:"\/\\\|\?*]/, '_').squeeze(' ').strip + '.epub'
-    new_path = File.join(File.dirname(epub_path), filename)
+def extract_metadata_fast(epub_path)
+  Zip::ZipInputStream.open(epub_path) do |io|
+    container_data = nil
+    opf_path = nil
     
-    return if File.exist?(new_path)
+    while entry = io.get_next_entry
+      if entry.name == 'META-INF/container.xml'
+        container_data = io.read
+        opf_path = Nokogiri::XML(container_data).at_xpath('//xmlns:rootfile/@full-path')&.value
+        break
+      end
+    end
+    return nil unless opf_path
     
-    File.rename(epub_path, new_path)
-    puts "#{File.basename(epub_path)} -> #{filename}"
+    Zip::ZipInputStream.open(epub_path) do |io2|
+      while entry = io2.get_next_entry
+        if entry.name == opf_path
+          doc = Nokogiri::XML(io2.read)
+          title = doc.at_xpath('//*[local-name()="title"]')&.text&.strip
+          author = doc.at_xpath('//*[local-name()="creator"]')&.text&.strip
+          return [title, author]
+        end
+      end
+    end
   end
+  nil
 end
 
-ARGV.each do |file|
-  if File.exist?(file) && file.end_with?('.epub')
-    rename_epub(file)
-  else
-    puts "Invalid file: #{file}"
-  end
+def rename_epub_fast(epub_path)
+  return unless File.exist?(epub_path) && epub_path.end_with?('.epub')
+  
+  title, author = extract_metadata_fast(epub_path)
+  return unless title
+
+  filename = "#{title}#{author ? " - #{author}" : ''}"
+               .gsub(INVALID_CHARS, '_')
+               .gsub(MULTIPLE_SPACES, ' ')
+               .strip + '.epub'
+  
+  new_path = File.join(File.dirname(epub_path), filename)
+  return if File.exist?(new_path)
+  
+  File.rename(epub_path, new_path)
+  puts "#{File.basename(epub_path)} -> #{filename}"
 end
 
+ARGV.each { |file| rename_epub_fast(file) }
 puts "Usage: #{$0} file.epub" if ARGV.empty?
