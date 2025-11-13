@@ -1,8 +1,9 @@
-# EPUB Optimizer - Comprehensive TODO List
+# EPUB Optimizer - TODO List
 
 ## High Priority
-- [ ] **Production Deployment Testing**
-  - [ ] Test all 5 execution methods on different operating systems (Windows, macOS, Linux)
+- [ ] **Core Script Testing**
+  - [ ] Test local execution on different operating systems (Windows, macOS, Linux)
+  - [ ] Test GitHub direct execution across different platforms
   - [ ] Test with various EPUB sizes (small <1MB, medium 1-10MB, large >10MB)
   - [ ] Validate EPUB compliance after optimization (EPUBCheck integration)
   - [ ] Performance testing on low-spec hardware
@@ -37,11 +38,11 @@
   - [ ] Add caching mechanism for repeated optimizations
   - [ ] Optimize memory usage for concurrent processing
 
-- [ ] **Integration & Automation**
-  - [ ] Create CI/CD pipeline integration scripts
-  - [ ] Add Docker container for easy deployment
-  - [ ] Implement REST API for web service integration
-  - [ ] Create plugins for popular ebook management tools (Calibre, etc.)
+- [ ] **Script Integration**
+  - [ ] Create CI/CD pipeline integration examples
+  - [ ] Add shell script examples for batch processing
+  - [ ] Create examples for integration with existing workflows
+  - [ ] Add examples for ebook management tools (Calibre, etc.)
 
 ## Low Priority
 - [ ] **User Experience**
@@ -61,12 +62,12 @@
   - [ ] Output directory preferences
   - [ ] File filtering options
 
-- [ ] **Advanced Features**
+- [ ] **Script Enhancements**
   - [ ] Add OCR optimization for scanned PDFs converted to EPUB
   - [ ] Implement language-specific text compression
   - [ ] Add accessibility optimization (alt-text generation, etc.)
-  - [ ] Create mobile app version
   - [ ] Add support for other ebook formats (MOBI, AZW)
+  - [ ] Create advanced command-line options
 
 ## Future Considerations
 - [ ] **Machine Learning Integration**
@@ -132,18 +133,18 @@
   - [ ] Document data handling practices
   - [ ] Add privacy policy for web service
 
-## Deployment & Distribution
-- [ ] **Package Management**
-  - [ ] Publish to RubyGems
-  - [ ] Create Homebrew formula
-  - [ ] Add to various package managers (apt, yum, etc.)
-  - [ ] Create Windows installer
-
-- [ ] **Distribution**
-  - [ ] Set up CDN for downloads
+## Distribution & Access
+- [ ] **Script Distribution**
+  - [ ] Optimize GitHub direct execution for faster loading
+  - [ ] Create smaller standalone script version
+  - [ ] Add version checking to direct execution
   - [ ] Create release notes and changelog
-  - [ ] Implement automatic update notifications
-  - [ ] Add mirror sites for global distribution
+
+- [ ] **Accessibility**
+  - [ ] Ensure script works on minimal Ruby installations
+  - [ ] Add fallback options when dependencies missing
+  - [ ] Create Windows-specific batch file examples
+  - [ ] Add macOS-specific shell script examples
 
 ## Community & Support
 - [ ] **Community Building**
@@ -218,7 +219,7 @@
 - **Compression**: 13-29% reduction consistently across test files
 - **Processing Speed**: 0.3-0.35s for typical EPUB files
 - **Success Rate**: 93% (90/96 files reduced in size during batch testing)
-- **Methods Working**: 4/5 execution methods operational
+- **Core Methods Working**: 2/2 primary methods operational
 - **Space Savings**: 16.2% (3.5MB saved from 22MB total in batch test)
 
 ### Test Results
@@ -226,12 +227,19 @@
 - **book_7977.epub**: 16.1% reduction (70KB saved from 438KB)  
 - **book_28395.epub**: 29.5% reduction (33KB saved from 112KB)
 
-### Execution Method Status
-- ✅ Development version (0.322s, fully functional)
-- ✅ Standalone executable (0.35s, fully functional)
-- ✅ GitHub direct execution (available, requires internet)
-- ✅ Shell web service (available, requires setup)
-- ⚠️ Installed version (requires install.sh, not tested in current environment)
+### Core Execution Methods Status
+- ✅ **Local Terminal Execution** (0.322s, fully functional)
+  ```bash
+  ruby lib/epub_optimizer.rb input.epub output.epub
+  ```
+- ✅ **GitHub Direct Execution** (fully functional, no installation)
+  ```bash
+  curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub_optimizer_direct.rb | ruby - input.epub output.epub
+  ```
+
+### Additional Options
+- ✅ **Standalone Script** (download and run locally)
+- ✅ **Development Version** (for contributors)
 
 ---
 
