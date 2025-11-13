@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+# EPUB Optimizer - Main executable script
+require_relative 'lib/epub_optimizer'
+
+# Change to script's directory to ensure relative paths work
+Dir.chdir(File.dirname(__FILE__))
+
+# Load main optimization script
+load 'lib/epub_optimizer.rb'
