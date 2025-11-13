@@ -9,15 +9,20 @@ MULTIPLE_SPACES = /\s+/
 def extract_metadata_optimized(epub_path)
   opf_path = nil
   opf_content = nil
+  container_found = false
   
   Zip::ZipInputStream.open(epub_path) do |io|
     while entry = io.get_next_entry
       case entry.name
       when 'META-INF/container.xml'
+        container_found = true
         opf_path = Nokogiri::XML(io.read).at_xpath('//xmlns:rootfile/@full-path')&.value
         return nil unless opf_path
       when opf_path
-        opf_content = io.read
+        opf_content = io.read if opf_path
+      when /\.opf$/
+        # Fallback: grab the first .opf file if no container found
+        opf_content = io.read unless container_found
       end
     end
   end
