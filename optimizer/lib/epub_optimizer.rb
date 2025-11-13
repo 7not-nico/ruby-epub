@@ -5,6 +5,7 @@ require 'tmpdir'
 require 'parallel'
 require 'nokogiri'
 require 'digest'
+require_relative '../lib/epub_utils'
 
 class EpubOptimizer
   VERSION = "3.0.0"
@@ -79,74 +80,11 @@ class EpubOptimizer
   private
 
   def extract_epub(input_path, temp_dir)
-    # Use concurrent extraction for EPUBs with many files
-    entries = []
-    
-    begin
-      Zip::ZipInputStream.open(input_path) do |zip|
-        while entry = zip.get_next_entry
-          next if entry.name.end_with?('/')
-          entries << { name: entry.name, content: zip.read }
-        end
-      end
-    rescue => e
-      puts "  Warning: Could not extract EPUB: #{e.message}"
-      return
-    end
-    
-    # Extract files in parallel for better performance
-    if entries.length > 20
-      Parallel.each(entries, in_threads: @threads) do |entry|
-        begin
-          file_path = File.join(temp_dir, entry[:name])
-          FileUtils.mkdir_p(File.dirname(file_path))
-          File.write(file_path, entry[:content])
-        rescue => e
-          puts "  Warning: Could not extract file #{entry[:name]}: #{e.message}"
-        end
-      end
-    else
-      # Sequential extraction for small EPUBs
-      entries.each do |entry|
-        begin
-          file_path = File.join(temp_dir, entry[:name])
-          FileUtils.mkdir_p(File.dirname(file_path))
-          File.write(file_path, entry[:content])
-        rescue => e
-          puts "  Warning: Could not extract file #{entry[:name]}: #{e.message}"
-        end
-      end
-    end
+    EpubUtils.extract_epub(input_path, temp_dir)
   end
 
   def discover_files(temp_dir)
-    files = {
-      images: [],
-      text_files: [],
-      fonts: [],
-      all_files: []
-    }
-    
-    # Lazy loading - defer expensive operations
-    Dir.glob("#{temp_dir}/**/*").each do |file|
-      next unless File.file?(file)
-      
-      ext = File.extname(file).downcase
-      # Defer size calculation until needed
-      file_info = { path: file, size: nil, hash: nil, ext: ext }
-      
-      files[:all_files] << file_info
-      
-      case ext
-      when '.jpg', '.jpeg', '.png', '.gif', '.webp'
-        files[:images] << file_info
-      when '.xhtml', '.html', '.css'
-        files[:text_files] << file_info
-      when '.ttf', '.otf', '.woff', '.woff2'
-        files[:fonts] << file_info
-      end
-    end
-    
+    files = EpubUtils.discover_files(temp_dir)
     puts "  Found: #{files[:images].length} images, #{files[:text_files].length} text files, #{files[:fonts].length} fonts"
     files
   end
@@ -232,15 +170,7 @@ class EpubOptimizer
   end
 
   def calculate_file_hash(file_path)
-    size = File.size(file_path)
-    return size.to_s if size < 2000
-    
-    File.open(file_path, 'rb') do |file|
-      first_chunk = file.read(1024)
-      file.seek(size - 1024)
-      last_chunk = file.read(1024)
-      Digest::SHA256.hexdigest("#{size}-#{first_chunk}-#{last_chunk}")
-    end
+    EpubUtils.calculate_file_hash(file_path)
   end
 
   def optimize_image(file_info)
@@ -495,44 +425,9 @@ class EpubOptimizer
   end
 
   def format_bytes(bytes)
-    units = ['B', 'KB', 'MB', 'GB']
-    size = bytes.to_f
-    unit_index = 0
-    
-    while size >= 1024 && unit_index < units.length - 1
-      size /= 1024
-      unit_index += 1
-    end
-    
-    "#{size.round(1)}#{units[unit_index]}"
+    EpubUtils.format_bytes(bytes)
   end
 end
-
-  def optimize_batch(input_files, output_dir = nil)
-    puts "Batch optimizing #{input_files.length} EPUB files..."
-    
-    # Use shared thread pool for batch processing
-    Parallel.each(input_files, in_threads: @threads) do |input_file|
-      next unless File.exist?(input_file)
-      
-      # Generate output filename
-      if output_dir
-        base_name = File.basename(input_file, '.epub')
-        output_file = File.join(output_dir, "#{base_name}_optimized.epub")
-      else
-        output_file = input_file.sub('.epub', '_optimized.epub')
-      end
-      
-      begin
-        puts "Processing: #{File.basename(input_file)}..."
-        optimize(input_file, output_file)
-      rescue => e
-        puts "Error processing #{input_file}: #{e.message}"
-      end
-    end
-    
-    puts "Batch optimization completed!"
-  end
 
 # Command line interface
 if __FILE__ == $0

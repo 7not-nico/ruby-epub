@@ -58,150 +58,26 @@ jobs:
         ruby -c lib/epub_optimizer.rb || { echo "❌ Ruby syntax error"; exit 1; }
         echo "✅ Syntax validation passed"
         
-    - name: Create test directory
+    - name: Create test EPUBs from static samples
       run: |
-        mkdir -p test_files
+        # Create basic test EPUB from static samples
+        cd optimizer/test_samples
+        zip -0Xq ../../test_basic.epub mimetype
+        zip -Xrq ../../test_basic.epub META-INF OEBPS/
         
-    - name: Create basic test EPUB
-      run: |
-        cd test_files
-        
-        # Create minimal EPUB structure
-        echo "application/epub+zip" > mimetype
-        mkdir -p META-INF OEBPS
-        
-        cat > META-INF/container.xml << 'EOF'
-<?xml version="1.0"?>
-<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
-  <rootfiles>
-    <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>
-  </rootfiles>
-</container>
-EOF
-        
-        cat > OEBPS/content.opf << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="2.0">
-  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-    <dc:title>Test EPUB for Optimization</dc:title>
-    <dc:creator>Test Author</dc:creator>
-    <dc:language>en</dc:language>
-  </metadata>
-  <manifest>
-    <item id="chapter1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>
-    <item id="style" href="style.css" media-type="text/css"/>
-  </manifest>
-  <spine>
-    <itemref idref="chapter1"/>
-  </spine>
-</package>
-EOF
-        
-        cat > OEBPS/chapter1.xhtml << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>Chapter 1</title>
-    <link rel="stylesheet" type="text/css" href="style.css"/>
-</head>
-<body>
-    <h1>Chapter 1: The Beginning</h1>
-    <p>This is a test chapter with some content to optimize.</p>
-    <p>Here's another paragraph with more text for testing purposes.</p>
-    <div class="highlight">This is a highlighted section.</div>
-</body>
-</html>
-EOF
-        
-        cat > OEBPS/style.css << 'EOF'
-body {
-    font-family: serif;
-    line-height: 1.6;
-    margin: 2em;
-}
-
-h1 {
-    color: #333;
-    border-bottom: 2px solid #333;
-}
-
-.highlight {
-    background-color: yellow;
-    padding: 0.5em;
-    border-radius: 4px;
-}
-
-p {
-    margin-bottom: 1em;
-    text-align: justify;
-}
-EOF
-        
-        # Create EPUB (zip without compression for mimetype)
-        zip -0Xq basic_test.epub mimetype
-        zip -Xrq basic_test.epub META-INF OEBPS/
-        cd ..
-        
-    - name: Create test EPUB with images
-      run: |
-        cd test_files
-        
-        # Create a simple test image using ImageMagick
-        convert -size 300x200 xc:skyblue -pointsize 30 -fill white -gravity center -annotate +0+0 "Test Image" cover.jpg
-        
-        # Update content.opf to include image
-        cat > OEBPS/content.opf << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="2.0">
-  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-    <dc:title>Test EPUB with Images</dc:title>
-    <dc:creator>Test Author</dc:creator>
-    <dc:language>en</dc:language>
-  </metadata>
-  <manifest>
-    <item id="chapter1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>
-    <item id="style" href="style.css" media-type="text/css"/>
-    <item id="cover" href="cover.jpg" media-type="image/jpeg"/>
-  </manifest>
-  <spine>
-    <itemref idref="chapter1"/>
-  </spine>
-</package>
-EOF
-        
-        # Update chapter to include image
-        cat > OEBPS/chapter1.xhtml << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>Chapter 1</title>
-    <link rel="stylesheet" type="text/css" href="style.css"/>
-</head>
-<body>
-    <div class="cover-image">
-        <img src="cover.jpg" alt="Test Cover Image"/>
-    </div>
-    <h1>Chapter 1: The Beginning</h1>
-    <p>This is a test chapter with an image and content to optimize.</p>
-    <p>Here's another paragraph with more text for testing purposes.</p>
-    <div class="highlight">This is a highlighted section.</div>
-</body>
-</html>
-EOF
-        
-        # Create EPUB with image
-        zip -0Xq image_test.epub mimetype
-        zip -Xrq image_test.epub META-INF OEBPS/ cover.jpg
-        cd ..
+        # Create test EPUB with cover image
+        zip -0Xq ../../test_with_image.epub mimetype
+        zip -Xrq ../../test_with_image.epub META-INF OEBPS/ cover.jpg
+        cd ../..
         
     - name: Test local execution - Basic EPUB
       run: |
-        ruby lib/epub_optimizer.rb test_files/basic_test.epub test_files/basic_test_optimized.epub
+        ruby optimizer/lib/epub_optimizer.rb test_basic.epub test_basic_optimized.epub
         
         # Check if optimized file exists and is smaller
-        if [ -f "test_files/basic_test_optimized.epub" ]; then
-          original_size=$(stat -f%z "test_files/basic_test.epub" 2>/dev/null || stat -c%s "test_files/basic_test.epub")
-          optimized_size=$(stat -f%z "test_files/basic_test_optimized.epub" 2>/dev/null || stat -c%s "test_files/basic_test_optimized.epub")
+        if [ -f "test_basic_optimized.epub" ]; then
+          original_size=$(stat -f%z "test_basic.epub" 2>/dev/null || stat -c%s "test_basic.epub")
+          optimized_size=$(stat -f%z "test_basic_optimized.epub" 2>/dev/null || stat -c%s "test_basic_optimized.epub")
           
           if [ $optimized_size -lt $original_size ]; then
             echo "✅ Basic EPUB optimization successful ($original_size → $optimized_size bytes)"
@@ -215,12 +91,12 @@ EOF
         
     - name: Test local execution - EPUB with images
       run: |
-        ruby lib/epub_optimizer.rb test_files/image_test.epub test_files/image_test_optimized.epub
+        ruby optimizer/lib/epub_optimizer.rb test_with_image.epub test_with_image_optimized.epub
         
         # Check if optimized file exists and is smaller
-        if [ -f "test_files/image_test_optimized.epub" ]; then
-          original_size=$(stat -f%z "test_files/image_test.epub" 2>/dev/null || stat -c%s "test_files/image_test.epub")
-          optimized_size=$(stat -f%z "test_files/image_test_optimized.epub" 2>/dev/null || stat -c%s "test_files/image_test_optimized.epub")
+        if [ -f "test_with_image_optimized.epub" ]; then
+          original_size=$(stat -f%z "test_with_image.epub" 2>/dev/null || stat -c%s "test_with_image.epub")
+          optimized_size=$(stat -f%z "test_with_image_optimized.epub" 2>/dev/null || stat -c%s "test_with_image_optimized.epub")
           
           if [ $optimized_size -lt $original_size ]; then
             echo "✅ Image EPUB optimization successful ($original_size → $optimized_size bytes)"
@@ -234,9 +110,9 @@ EOF
         
     - name: Test GitHub direct execution
       run: |
-        curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/lib/epub_optimizer.rb | ruby - test_files/basic_test.epub test_files/github_test.epub
+        curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/optimizer/lib/epub_optimizer.rb | ruby - test_basic.epub github_test.epub
         
-        if [ -f "test_files/github_test.epub" ]; then
+        if [ -f "github_test.epub" ]; then
           echo "✅ GitHub direct execution works"
         else
           echo "❌ GitHub direct execution failed"
@@ -246,7 +122,7 @@ EOF
     - name: Validate EPUB structure
       run: |
         # Test that optimized files are still valid EPUBs
-        for epub in test_files/*_optimized.epub test_files/github_test.epub; do
+        for epub in *_optimized.epub github_test.epub; do
           if [ -f "$epub" ]; then
             echo "Validating $epub..."
             
@@ -272,7 +148,7 @@ EOF
       run: |
         # Performance test - should complete within reasonable time
         start_time=$(date +%s)
-        ruby lib/epub_optimizer.rb test_files/image_test.epub test_files/perf_test.epub
+        ruby optimizer/lib/epub_optimizer.rb test_with_image.epub perf_test.epub
         end_time=$(date +%s)
         
         duration=$((end_time - start_time))
@@ -298,4 +174,4 @@ EOF
     - name: Cleanup
       if: always()
       run: |
-        rm -rf test_files/
+        rm -f test_*.epub
