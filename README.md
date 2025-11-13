@@ -16,7 +16,7 @@ A fast, terminal-based Ruby script to optimize EPUB files. Run locally or direct
 
 ### Option 1: GitHub Direct Execution (No Installation)
 ```bash
-curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/scripts/epub_optimizer_direct.rb | ruby - input.epub output.epub
+curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/lib/epub_optimizer.rb | ruby - input.epub output.epub
 ```
 
 ### Option 2: Local Setup
@@ -37,7 +37,7 @@ ruby lib/epub_optimizer.rb input.epub output.epub
 ### Basic Usage
 ```bash
 # GitHub direct execution
-curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/scripts/epub_optimizer_direct.rb | ruby - book.epub optimized_book.epub
+curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/lib/epub_optimizer.rb | ruby - book.epub optimized_book.epub
 
 # Local execution
 ruby lib/epub_optimizer.rb book.epub optimized_book.epub
@@ -47,7 +47,7 @@ ruby lib/epub_optimizer.rb book.epub optimized_book.epub
 ```bash
 # Process multiple EPUB files
 for file in *.epub; do
-  curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/scripts/epub_optimizer_direct.rb | ruby - "$file" "optimized_$file"
+  curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/lib/epub_optimizer.rb | ruby - "$file" "optimized_$file"
 done
 ```
 
@@ -84,18 +84,16 @@ gem install zip mini_magick parallel nokogiri
 # CentOS/RHEL: sudo yum install ImageMagick
 ```
 
-## Project Structure
+## Project Structure (KISS)
 
 ```
 ruby-epub/
 ├── lib/
 │   └── epub_optimizer.rb          # Core optimizer
-├── scripts/
-│   ├── epub_optimizer_direct.rb     # GitHub direct execution
-│   └── epub_optimizer_standalone.rb # Standalone script
 ├── docs/
 │   └── TODO.md                   # Future enhancements
 ├── Gemfile                       # Ruby dependencies
+├── .gitignore                   # Git ignore file
 └── README.md                     # This file
 ```
 
@@ -106,7 +104,7 @@ ruby-epub/
 ruby lib/epub_optimizer.rb test_file.epub test_output.epub
 
 # Test GitHub direct execution
-curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/scripts/epub_optimizer_direct.rb | ruby - test_file.epub test_output.epub
+curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/lib/epub_optimizer.rb | ruby - test_file.epub test_output.epub
 ```
 
 ## License
