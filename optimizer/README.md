@@ -1,61 +1,28 @@
-# EPUB Tools
+# EPUB Optimizer
 
-A collection of terminal-based Ruby tools for EPUB file management.
+Compress EPUB files by optimizing images and minifying text.
 
-## 🚀 EPUB Renamer
+## Usage
 
-Rename EPUB files based on their metadata (title and author).
-
-### Usage
-
-#### Method 1: Local Execution
 ```bash
-# Download and run
-curl -O https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub-renamer/epub-renamer
-chmod +x epub-renamer
-./epub-renamer your-book.epub
-./epub-renamer *.epub
+# Local
+./epub_optimizer input.epub output.epub
+
+# GitHub direct
+curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/optimizer/temp_repo/epub_optimizer_github.rb | ruby - input.epub output.epub
 ```
 
-#### Method 2: Direct GitHub Execution
-```bash
-# No download required
-curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub-renamer/epub-renamer-github.sh | bash -s -- your-book.epub
-curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub-renamer/epub-renamer-github.sh | bash -s -- *.epub
-```
+## What It Does
 
-### What It Does
-- Extracts title and author from EPUB metadata
-- Renames file to: `"Title - Author.epub"`
-- Handles special characters safely
-- Skips files that would cause conflicts
+- Resizes large images (max 1200x1600)
+- Converts to WebP when smaller
+- Removes HTML/CSS whitespace and comments
+- Eliminates duplicate files
 
-### Example
-```bash
-$ ./epub-renamer messy_book_name.epub
-messy_book_name.epub -> The Great Gatsby - F. Scott Fitzgerald.epub
-```
+## Requirements
 
-## 📁 Project Structure
+Ruby 2.7+, ImageMagick, gems: zip mini_magick parallel nokogiri
 
-```
-ruby-epub/
-├── epub-renamer/          # EPUB renamer tool
-│   ├── epub-renamer       # Main script
-│   └── epub-renamer-github.sh  # GitHub runner
-├── lib/
-│   └── epub_optimizer.rb  # EPUB optimizer
-└── .github/workflows/     # CI/CD
-```
+## Performance
 
-## ✅ Requirements
-
-- Ruby (most systems have it)
-- Internet connection (for GitHub method only)
-
-## 📖 More Information
-
-- **EPUB Renamer**: See `epub-renamer/README.md` for detailed usage
-- **EPUB Optimizer**: See `lib/epub_optimizer.rb` for optimization features
-
-Simple and focused EPUB tools.
+15-30% size reduction, ~0.3s processing time.
