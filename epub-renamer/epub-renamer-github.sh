@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # EPUB Renamer - GitHub Direct Runner
-# Usage: curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/renaming-epub/epub-renamer-github.sh | bash -s -- file1.epub file2.epub
+# Usage: curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub-renamer/epub-renamer-github.sh | bash -s -- file1.epub file2.epub
 
 set -e
 
@@ -26,7 +26,7 @@ TEMP_SCRIPT=$(mktemp)
 trap "rm -f $TEMP_SCRIPT" EXIT
 
 # Download main script
-curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/renaming-epub/epub-renamer -o "$TEMP_SCRIPT"
+curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub-renamer/epub-renamer -o "$TEMP_SCRIPT"
 
 # Make it executable
 chmod +x "$TEMP_SCRIPT"
@@ -34,7 +34,7 @@ chmod +x "$TEMP_SCRIPT"
 # Run script with passed arguments
 if [ $# -eq 0 ]; then
     echo "Usage: epub-renamer-github file.epub [file2.epub ...]"
-    echo "Example: curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/renaming-epub/epub-renamer-github.sh | bash -s -- mybook.epub"
+    echo "Example: curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub-renamer/epub-renamer-github.sh | bash -s -- mybook.epub"
 else
     ruby "$TEMP_SCRIPT" "$@"
 fi
