@@ -32,7 +32,7 @@ class ParallelOptimizer
             filename = File.basename(epub)
             output = "optimized/#{filename}"
             
-            puts "[#{start_idx + i}/#{total}] Optimizing #{filename} (#{format_bytes(File.size(epub)})..."
+            puts "[#{start_idx + i}/#{total}] Optimizing #{filename} (#{format_bytes(File.size(epub))})..."
             
             start_time = Time.now
             @optimizer.optimize(epub, output)
