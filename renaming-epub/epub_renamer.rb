@@ -6,38 +6,36 @@ require 'nokogiri'
 INVALID_CHARS = /[<>:"\/\\\|\?*]/
 MULTIPLE_SPACES = /\s+/
 
-def extract_metadata_fast(epub_path)
+def extract_metadata_optimized(epub_path)
+  opf_path = nil
+  opf_content = nil
+  
   Zip::ZipInputStream.open(epub_path) do |io|
-    container_data = nil
-    opf_path = nil
-    
     while entry = io.get_next_entry
-      if entry.name == 'META-INF/container.xml'
-        container_data = io.read
-        opf_path = Nokogiri::XML(container_data).at_xpath('//xmlns:rootfile/@full-path')&.value
-        break
-      end
-    end
-    return nil unless opf_path
-    
-    Zip::ZipInputStream.open(epub_path) do |io2|
-      while entry = io2.get_next_entry
-        if entry.name == opf_path
-          doc = Nokogiri::XML(io2.read)
-          title = doc.at_xpath('//*[local-name()="title"]')&.text&.strip
-          author = doc.at_xpath('//*[local-name()="creator"]')&.text&.strip
-          return [title, author]
-        end
+      case entry.name
+      when 'META-INF/container.xml'
+        opf_path = Nokogiri::XML(io.read).at_xpath('//xmlns:rootfile/@full-path')&.value
+        return nil unless opf_path
+      when opf_path
+        opf_content = io.read
       end
     end
   end
-  nil
+  
+  return nil unless opf_content
+  
+  namespaces = {'dc' => 'http://purl.org/dc/elements/1.1/'}
+  doc = Nokogiri::XML(opf_content)
+  title = doc.at_xpath('//dc:title', namespaces)&.text&.strip
+  author = doc.at_xpath('//dc:creator', namespaces)&.text&.strip
+  
+  [title, author]
 end
 
-def rename_epub_fast(epub_path)
-  return unless File.exist?(epub_path) && epub_path.end_with?('.epub')
+def rename_epub_optimized(epub_path)
+  return unless epub_path.end_with?('.epub') && File.exist?(epub_path)
   
-  title, author = extract_metadata_fast(epub_path)
+  title, author = extract_metadata_optimized(epub_path)
   return unless title
 
   filename = "#{title}#{author ? " - #{author}" : ''}"
@@ -52,5 +50,5 @@ def rename_epub_fast(epub_path)
   puts "#{File.basename(epub_path)} -> #{filename}"
 end
 
-ARGV.each { |file| rename_epub_fast(file) }
+ARGV.each { |file| rename_epub_optimized(file) }
 puts "Usage: #{$0} file.epub" if ARGV.empty?
