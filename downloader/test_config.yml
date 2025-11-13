@@ -1,0 +1,5 @@
+threads: 4
+timeout: 15
+log_level: debug
+sources:
+  - 'https://www.gutenberg.org/cache/epub/11/pg11.epub'

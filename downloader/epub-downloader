@@ -4,12 +4,13 @@ require 'net/http'
 require 'uri'
 require 'fileutils'
 require 'parallel'
+require 'yaml'
 require_relative 'lib/epub_downloader'
 
 class EpubDownloaderApp
-  def initialize
-    @downloader = EpubDownloader.new
-    @sources = load_sources
+  def initialize(config_file = 'config.yml')
+    @downloader = EpubDownloader.new(config_file)
+    @sources = load_sources_from_config(config_file)
   end
 
   def run(count = 100)
@@ -27,8 +28,23 @@ class EpubDownloaderApp
 
   private
 
-  def load_sources
+  def load_sources_from_config(config_file = 'config.yml')
+    if File.exist?(config_file)
+      begin
+        config = YAML.load_file(config_file)
+        return config['sources'] || fallback_sources
+      rescue => e
+        puts "⚠️  Warning: Could not load sources from config: #{e.message}"
+        return fallback_sources
+      end
+    else
+      fallback_sources
+    end
+  end
+
+  def fallback_sources
     [
+      # Project Gutenberg Classics
       'https://www.gutenberg.org/cache/epub/11/pg11.epub',
       'https://www.gutenberg.org/cache/epub/74/pg74.epub',
       'https://www.gutenberg.org/cache/epub/1661/pg1661.epub',
@@ -45,6 +61,7 @@ end
 
 if __FILE__ == $0
   count = ARGV[0] ? ARGV[0].to_i : 100
-  app = EpubDownloaderApp.new
+  config_file = ARGV[1] || 'config.yml'
+  app = EpubDownloaderApp.new(config_file)
   app.run(count)
 end

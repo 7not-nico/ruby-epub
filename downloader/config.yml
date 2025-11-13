@@ -1,0 +1,45 @@
+# EPUB Downloader Configuration
+
+# Download settings
+threads: 8
+timeout: 30
+max_retries: 3
+output_directory: "downloaded_epubs"
+
+# EPUB sources
+sources:
+  # Project Gutenberg Classics
+  - "https://www.gutenberg.org/cache/epub/11/pg11.epub"
+  - "https://www.gutenberg.org/cache/epub/74/pg74.epub"
+  - "https://www.gutenberg.org/cache/epub/1661/pg1661.epub"
+  - "https://www.gutenberg.org/cache/epub/2701/pg2701.epub"
+  - "https://www.gutenberg.org/cache/epub/345/pg345.epub"
+  - "https://www.gutenberg.org/cache/epub/1342/pg1342.epub"
+  - "https://www.gutenberg.org/cache/epub/84/pg84.epub"
+  - "https://www.gutenberg.org/cache/epub/23/pg23.epub"
+  - "https://www.gutenberg.org/cache/epub/2591/pg2591.epub"
+  - "https://www.gutenberg.org/cache/epub/43/pg43.epub"
+  - "https://www.gutenberg.org/cache/epub/1232/pg1232.epub"
+  - "https://www.gutenberg.org/cache/epub/5200/pg5200.epub"
+  - "https://www.gutenberg.org/cache/epub/1400/pg1400.epub"
+  - "https://www.gutenberg.org/cache/epub/3090/pg3090.epub"
+  - "https://www.gutenberg.org/cache/epub/174/pg174.epub"
+  
+  # Internet Archive EPUBs
+  - "https://archive.org/download/the-great-gatsby_202301/the-great-gatsby.epub"
+  - "https://archive.org/download/1984-george-orwell/1984-george-orwell.epub"
+  - "https://archive.org/download/brave-new-world-aldous-huxley/brave-new-world-aldous-huxley.epub"
+  
+  # Standard Ebooks
+  - "https://www.gutenberg.org/cache/epub/2600/pg2600.epub" # War and Peace
+  - "https://www.gutenberg.org/cache/epub/996/pg996.epub"   # Don Quixote
+  - "https://www.gutenberg.org/cache/epub/844/pg844.epub"    # The Iliad
+
+# File verification
+verify_checksums: true
+min_file_size: 1024  # bytes
+max_file_size: 104857600  # 100MB
+
+# Logging
+log_level: "info"  # debug, info, warn, error
+log_file: "downloader.log"
