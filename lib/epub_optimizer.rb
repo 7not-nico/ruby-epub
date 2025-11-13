@@ -8,6 +8,7 @@ require 'digest'
 require 'set'
 
 class EpubOptimizer
+  VERSION = "1.0.0"
   def initialize
     # Optimize thread count based on system and workload
     cpu_count = `nproc`.to_i
@@ -45,6 +46,7 @@ class EpubOptimizer
     
     puts "Optimized: #{output_path} (#{format_bytes(output_size)})"
     puts "Space saved: #{format_bytes(savings)} (#{savings_percent}% reduction)"
+    puts "EPUB optimization completed successfully!"
   end
 
   private
@@ -610,5 +612,29 @@ class EpubOptimizer
     end
     
     "#{size.round(1)}#{units[unit_index]}"
+  end
+end
+
+# Command line interface
+if __FILE__ == $0
+  if ARGV.length != 2
+    puts "Usage: #{$0} <input.epub> <output.epub>"
+    exit 1
+  end
+  
+  input_file = ARGV[0]
+  output_file = ARGV[1]
+  
+  unless File.exist?(input_file)
+    puts "Error: Input file '#{input_file}' not found"
+    exit 1
+  end
+  
+  begin
+    optimizer = EpubOptimizer.new
+    optimizer.optimize(input_file, output_file)
+  rescue => e
+    puts "Error: #{e.message}"
+    exit 1
   end
 end

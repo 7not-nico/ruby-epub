@@ -72,17 +72,41 @@ curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub_optimi
 curl -sSL https://raw.githubusercontent.com/7not-nico/ruby-epub/main/epub_optimizer_direct.rb | ruby - input.epub output.epub
 ```
 
-## Usage
+## Version Management
 
 ```bash
-./bin/epub_optimizer input.epub output.epub
+# Check current version
+ruby version.rb --version
+
+# Check for updates
+ruby version.rb --check-updates
+```
+
+## Usage Examples
+
+For comprehensive usage examples, see [USAGE_EXAMPLES.md](USAGE_EXAMPLES.md).
+
+### Basic Usage
+```bash
+epub_optimizer input.epub output.epub
 ```
 
 Example output:
 ```
 Optimizing book.epub (2.5MB)...
+  Content type: image-heavy (15 images, 25 text files)
 Optimized: book_optimized.epub (1.8MB)
 Space saved: 700.0KB (28.0% reduction)
+EPUB optimization completed successfully!
+```
+
+### Performance Benchmarking
+```bash
+# Benchmark specific files
+ruby benchmark.rb file1.epub file2.epub
+
+# Benchmark all EPUBs in directory
+ruby benchmark.rb test_results/*.epub
 ```
 
 ## How it Works
@@ -124,3 +148,42 @@ Space saved: 700.0KB (28.0% reduction)
 - Ruby 2.7+
 - ImageMagick (for MiniMagick)
 - Linux/macOS/Windows
+
+## Project Structure
+
+```
+ruby-epub/
+├── lib/
+│   └── epub_optimizer.rb          # Core optimizer library
+├── bin/
+│   └── epub_optimizer             # Development executable
+├── epub_optimizer_standalone.rb   # Standalone executable
+├── epub_optimizer_direct.rb       # GitHub direct execution
+├── install.sh                     # Installation script
+├── version.rb                     # Version management
+├── benchmark.rb                   # Performance benchmarking
+├── USAGE_EXAMPLES.md              # Comprehensive usage examples
+└── README.md                      # This file
+```
+
+## Testing
+
+```bash
+# Run benchmark tests
+ruby benchmark.rb test_results/*.epub
+
+# Test all execution methods
+ruby test_all_methods.rb
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test with `ruby benchmark.rb`
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details.
