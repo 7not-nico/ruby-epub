@@ -2,8 +2,18 @@
 
 require_relative '../lib/epub_optimizer'
 
-input, output = ARGV
-abort "Usage: #{$0} input.epub output.epub" unless input && output
-abort "File not found: #{input}" unless File.exist?(input)
+if ARGV.length != 2
+  puts "Usage: #{$0} <input.epub> <output.epub>"
+  exit 1
+end
 
-EpubOptimizer.new.optimize(input, output)
+input_file = ARGV[0]
+output_file = ARGV[1]
+
+unless File.exist?(input_file)
+  puts "Error: Input file '#{input_file}' not found"
+  exit 1
+end
+
+optimizer = EpubOptimizer.new
+optimizer.optimize(input_file, output_file)
